@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { execSync } = require('child_process');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -12,7 +13,7 @@ const showHelp = args.includes('--help') || args.includes('-h');
 
 // Display help
 if (showHelp) {
-  console.log('Claude Code Thinking Visibility Patcher v2.0.13');
+  console.log('Claude Code Thinking Visibility Patcher v2.0.14');
   console.log('==============================================\n');
   console.log('Usage: node patch-thinking.js [options]\n');
   console.log('Options:');
@@ -26,36 +27,125 @@ if (showHelp) {
   process.exit(0);
 }
 
-console.log('Claude Code Thinking Visibility Patcher v2.0.13');
+console.log('Claude Code Thinking Visibility Patcher v2.0.14');
 console.log('==============================================\n');
+
+// Helper function to safely execute shell commands
+function safeExec(command) {
+  try {
+    return execSync(command, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
+  } catch (error) {
+    return null;
+  }
+}
 
 // Auto-detect Claude Code installation path
 function getClaudeCodePath() {
   const homeDir = os.homedir();
+  const attemptedPaths = [];
 
-  // Try different possible installation locations
-  const possiblePaths = [
+  // Helper to check and return path if it exists
+  function checkPath(testPath, method) {
+    if (!testPath) return null;
+
+    attemptedPaths.push({ path: testPath, method });
+
+    try {
+      if (fs.existsSync(testPath)) {
+        // Resolve symlinks for global npm installs
+        try {
+          const realPath = fs.realpathSync(testPath);
+          return realPath;
+        } catch (e) {
+          return testPath;
+        }
+      }
+    } catch (error) {
+      // Path check failed, continue
+    }
+    return null;
+  }
+
+  // PRIORITY 1: Local installations (existing behavior - user overrides)
+  const localPaths = [
     path.join(homeDir, '.claude', 'local', 'node_modules', '@anthropic-ai', 'claude-code', 'cli.js'),
     path.join(homeDir, '.config', 'claude', 'local', 'node_modules', '@anthropic-ai', 'claude-code', 'cli.js'),
   ];
 
-  for (const testPath of possiblePaths) {
-    if (fs.existsSync(testPath)) {
-      return testPath;
+  for (const localPath of localPaths) {
+    const found = checkPath(localPath, 'local installation');
+    if (found) return found;
+  }
+
+  // PRIORITY 2: Global npm installation via 'npm root -g'
+  const npmGlobalRoot = safeExec('npm root -g');
+  if (npmGlobalRoot) {
+    const npmGlobalPath = path.join(npmGlobalRoot, '@anthropic-ai', 'claude-code', 'cli.js');
+    const found = checkPath(npmGlobalPath, 'npm root -g');
+    if (found) return found;
+  }
+
+  // PRIORITY 3: Derive from process.execPath
+  // Global modules are typically in ../lib/node_modules relative to node binary
+  const nodeDir = path.dirname(process.execPath);
+  const derivedGlobalPath = path.join(nodeDir, '..', 'lib', 'node_modules', '@anthropic-ai', 'claude-code', 'cli.js');
+  const found = checkPath(derivedGlobalPath, 'derived from process.execPath');
+  if (found) return found;
+
+  // PRIORITY 4: Unix systems - try 'which claude' to find binary
+  if (process.platform !== 'win32') {
+    const claudeBinary = safeExec('which claude');
+    if (claudeBinary) {
+      try {
+        // Resolve symlinks
+        const realBinary = fs.realpathSync(claudeBinary);
+        // Navigate from bin/claude to lib/node_modules/@anthropic-ai/claude-code/cli.js
+        const binDir = path.dirname(realBinary);
+        const nodeModulesPath = path.join(binDir, '..', 'lib', 'node_modules', '@anthropic-ai', 'claude-code', 'cli.js');
+        const foundFromBinary = checkPath(nodeModulesPath, 'which claude');
+        if (foundFromBinary) return foundFromBinary;
+      } catch (e) {
+        // Failed to resolve, continue
+      }
     }
   }
 
+  // No installation found, return null and include attempted paths for error reporting
+  getClaudeCodePath.attemptedPaths = attemptedPaths;
   return null;
 }
 
 const targetPath = getClaudeCodePath();
 
 if (!targetPath) {
-  console.error('❌ Error: Could not find Claude Code installation');
-  console.error('\nSearched in:');
-  console.error('  - ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js');
-  console.error('  - ~/.config/claude/local/node_modules/@anthropic-ai/claude-code/cli.js');
-  console.error('\nPlease ensure Claude Code is installed.');
+  console.error('❌ Error: Could not find Claude Code installation\n');
+  console.error('Searched using the following methods:\n');
+
+  const attemptedPaths = getClaudeCodePath.attemptedPaths || [];
+
+  if (attemptedPaths.length > 0) {
+    // Group by method for cleaner output
+    const byMethod = {};
+    attemptedPaths.forEach(({ path, method }) => {
+      if (!byMethod[method]) byMethod[method] = [];
+      byMethod[method].push(path);
+    });
+
+    Object.entries(byMethod).forEach(([method, paths]) => {
+      console.error(`  [${method}]`);
+      paths.forEach(p => console.error(`    - ${p}`));
+    });
+  } else {
+    console.error('  - ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js');
+    console.error('  - ~/.config/claude/local/node_modules/@anthropic-ai/claude-code/cli.js');
+    console.error('  - Global npm installation (npm root -g)');
+  }
+
+  console.error('\n💡 Troubleshooting:');
+  console.error('  1. Verify Claude Code is installed: claude --version');
+  console.error('  2. For local install: Check ~/.claude/local or ~/.config/claude/local');
+  console.error('  3. For global install: Ensure "npm install -g @anthropic-ai/claude-code" succeeded');
+  console.error('  4. Check that npm is in your PATH if using global install');
   process.exit(1);
 }
 
@@ -86,13 +176,13 @@ if (!fs.existsSync(targetPath)) {
 
 let content = fs.readFileSync(targetPath, 'utf8');
 
-// Patch 1: hGB Banner Removal (v2.0.13)
-const bannerSearchPattern = 'function hGB({streamMode:A}){let[B,Q]=RX1.useState(null),[Z,G]=RX1.useState(null);if(RX1.useEffect(()=>{if(A==="thinking"&&B===null)Q(Date.now());else if(A!=="thinking"&&B!==null)G(Date.now()-B),Q(null)},[A,B]),A==="thinking")return TL.createElement(j,{marginTop:1},TL.createElement($,{dimColor:!0},"∴ Thinking…"));if(Z!==null)return TL.createElement(j,{marginTop:1},TL.createElement($,{dimColor:!0},"∴ Thought for ",Math.max(1,Math.round(Z/1000)),"s"," ",TL.createElement($,{dimColor:!0,bold:!0},"(ctrl+o")," ","to show thinking)"));return null}';
-const bannerReplacement = 'function hGB({streamMode:A}){return null}';
+// Patch 1: pGB Banner Removal (v2.0.14)
+const bannerSearchPattern = 'function pGB({streamMode:A}){let[B,Q]=TX1.useState(null),[Z,G]=TX1.useState(null);if(TX1.useEffect(()=>{if(A==="thinking"&&B===null)Q(Date.now());else if(A!=="thinking"&&B!==null)G(Date.now()-B),Q(null)},[A,B]),A==="thinking")return TL.createElement(j,{marginTop:1},TL.createElement($,{dimColor:!0},"∴ Thinking…"));if(Z!==null)return TL.createElement(j,{marginTop:1},TL.createElement($,{dimColor:!0},"∴ Thought for ",Math.max(1,Math.round(Z/1000)),"s"," ",TL.createElement($,{dimColor:!0,bold:!0},"(ctrl+o")," ","to show thinking)"));return null}';
+const bannerReplacement = 'function pGB({streamMode:A}){return null}';
 
-// Patch 2: Thinking Visibility (v2.0.13)
-const thinkingSearchPattern = 'case"thinking":if(!D)return null;if(K)return null;return z3.createElement(xlB,{addMargin:B,param:A,isTranscriptMode:D});';
-const thinkingReplacement = 'case"thinking":if(K)return null;return z3.createElement(xlB,{addMargin:B,param:A,isTranscriptMode:!0});';
+// Patch 2: Thinking Visibility (v2.0.14)
+const thinkingSearchPattern = 'case"thinking":if(!D)return null;if(K)return null;return z3.createElement(dlB,{addMargin:B,param:A,isTranscriptMode:D});';
+const thinkingReplacement = 'case"thinking":if(K)return null;return z3.createElement(dlB,{addMargin:B,param:A,isTranscriptMode:!0});';
 
 let patch1Applied = false;
 let patch2Applied = false;
@@ -100,7 +190,7 @@ let patch2Applied = false;
 // Check if patches can be applied
 console.log('Checking patches...\n');
 
-console.log('Patch 1: hGB banner removal');
+console.log('Patch 1: pGB banner removal');
 if (content.includes(bannerSearchPattern)) {
   patch1Applied = true;
   console.log('  ✅ Pattern found - ready to apply');
@@ -153,7 +243,7 @@ console.log('\nApplying patches...');
 // Apply Patch 1
 if (patch1Applied) {
   content = content.replace(bannerSearchPattern, bannerReplacement);
-  console.log('✅ Patch 1 applied: hGB function now returns null');
+  console.log('✅ Patch 1 applied: pGB function now returns null');
 }
 
 // Apply Patch 2

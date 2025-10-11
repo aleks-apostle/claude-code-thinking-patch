@@ -11,7 +11,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.13 (Updated 2025-10-10)
+**Current Version:** Claude Code 2.0.14 (Updated 2025-10-11)
 
 ## Quick Start
 
@@ -48,17 +48,17 @@ That's it! Thinking blocks now display inline without `ctrl+o`.
 
 This patch modifies two locations in Claude Code's compiled JavaScript:
 
-### Patch 1: Remove the Banner (v2.0.13)
+### Patch 1: Remove the Banner (v2.0.14)
 **Before:**
 ```javascript
-function hGB({streamMode:A}){
+function pGB({streamMode:A}){
   // ... displays "Thought for Xs (ctrl+o to show thinking)"
 }
 ```
 
 **After:**
 ```javascript
-function hGB({streamMode:A}){return null}
+function pGB({streamMode:A}){return null}
 ```
 
 **Effect:** Removes the collapsed thinking banner entirely.
@@ -68,18 +68,19 @@ function hGB({streamMode:A}){return null}
 - v2.0.10: Renamed to `br2`, used `PE.createElement`
 - v2.0.11: Renamed to `er2`, uses `_E.createElement`
 - v2.0.13: Renamed to `hGB`, uses `TL.createElement`
+- v2.0.14: Renamed to `pGB`, uses `TL.createElement`, `TX1.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.13)
+### Patch 2: Force Thinking Visibility (v2.0.14)
 **Before:**
 ```javascript
 case"thinking":if(!D)return null;if(K)return null;
-  return z3.createElement(xlB,{addMargin:B,param:A,isTranscriptMode:D});
+  return z3.createElement(dlB,{addMargin:B,param:A,isTranscriptMode:D});
 ```
 
 **After:**
 ```javascript
 case"thinking":if(K)return null;
-  return z3.createElement(xlB,{addMargin:B,param:A,isTranscriptMode:!0});
+  return z3.createElement(dlB,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -89,11 +90,12 @@ case"thinking":if(K)return null;
 - v2.0.10: Changed to `DOB` component, `z`→`H` variable
 - v2.0.11: Changed to `SOB` component, `H`→`z` variable
 - v2.0.13: Changed to `xlB` component, `K`→`D` variable swap
+- v2.0.14: Changed to `dlB` component, maintains `K` and `D` variable pattern
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.13 installed
+- Claude Code v2.0.14 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -178,18 +180,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.13):
+Check if patches are applied (for v2.0.14):
 
 ```bash
-# Check hGB patch
-grep -n "function hGB" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check pGB patch
+grep -n "function pGB" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function hGB({streamMode:A}){return null}
+# Should show: function pGB({streamMode:A}){return null}
 
 # Check thinking visibility patch
 grep -n 'case"thinking":if(K)return null' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":if(K)return null;return z3.createElement(xlB,{addMargin:B,param:A,isTranscriptMode:!0});
+# Should show: case"thinking":if(K)return null;return z3.createElement(dlB,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 ## Troubleshooting
@@ -236,16 +238,16 @@ Path detection is automatic using Node.js `os.homedir()`.
 
 ### File Structure
 - **cli.js:** ~3,500+ lines, ~9+ MB (heavily minified)
-- **Version:** Claude Code 2.0.13
+- **Version:** Claude Code 2.0.14
 - **Patches:** Non-invasive, minimal changes
 
 ### Why Two Patches?
 
-1. **hGB Function:** Controls the UI banner shown after thinking completes
+1. **pGB Function:** Controls the UI banner shown after thinking completes
 2. **Thinking Renderer:** Controls whether the actual thinking text is displayed
 
 Both must be patched because they're separate systems:
-- Patching only hGB → Blank line appears where thinking should be
+- Patching only pGB → Blank line appears where thinking should be
 - Patching only the renderer → Banner still shows "ctrl+o to show"
 
 ### Pattern Evolution Across Versions
@@ -258,6 +260,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.10  | `br2`          | `DOB`     | `H` check |
 | 2.0.11  | `er2`          | `SOB`     | `z` check |
 | 2.0.13  | `hGB`          | `xlB`     | `K` check |
+| 2.0.14  | `pGB`          | `dlB`     | `K` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification.
 
@@ -266,7 +269,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.13
+4. **Version-specific:** Patterns are specific to v2.0.14
 
 ## Feature Request
 
@@ -304,8 +307,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-10-10
-**Claude Code Version:** 2.0.13
+**Last Updated:** 2025-10-11
+**Claude Code Version:** 2.0.14
 **Status:** ✅ Working
 
 ### Quick Reference
