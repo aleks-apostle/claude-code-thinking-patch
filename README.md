@@ -19,13 +19,18 @@ You have to press `ctrl+o` every time to see the actual thinking content. This p
 # Clone or download this repository
 cd claude-code-thinking
 
-# Run the patch script
+# Run the patch script (automatically detects your installation)
 node patch-thinking.js
 
 # Restart Claude Code
 ```
 
 That's it! Thinking blocks now display inline without `ctrl+o`.
+
+**Works with:**
+- ✅ Local installations (`~/.claude/local`)
+- ✅ Global npm installations (`npm install -g @anthropic-ai/claude-code`)
+- ✅ All Node version managers (NVM, nodenv, asdf, etc.)
 
 ## What This Patch Does
 
@@ -132,13 +137,36 @@ node patch-thinking.js --restore
 node patch-thinking.js --help
 ```
 
-## Files Modified
+## Installation Detection
 
-The script automatically detects and patches the Claude Code installation:
+The script **automatically detects** Claude Code installations using a robust 4-tier detection strategy:
 
-**Searched Locations:**
-- `~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js`
-- `~/.config/claude/local/node_modules/@anthropic-ai/claude-code/cli.js`
+### Detection Methods (Priority Order)
+
+1. **Local Installations** (Priority 1)
+   - `~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js`
+   - `~/.config/claude/local/node_modules/@anthropic-ai/claude-code/cli.js`
+
+2. **Global npm Installation** (Priority 2)
+   - Dynamically detected via `npm root -g`
+   - Works with **all Node version managers** (NVM, nodenv, asdf, nvm-windows)
+   - Automatically resolves symlinks
+
+3. **Derived from Node.js Binary** (Priority 3)
+   - Falls back to `process.execPath` derivation
+   - Works when npm command is unavailable
+
+4. **Unix Binary Location** (Priority 4)
+   - Uses `which claude` on macOS/Linux
+   - Traces binary back to installation directory
+
+### Key Features
+
+- ✅ **Works with any Node version** - No hardcoded paths
+- ✅ **Supports all version managers** - NVM, nodenv, asdf, etc.
+- ✅ **Cross-platform** - macOS, Linux, Windows
+- ✅ **Automatic symlink resolution** - Handles npm global symlinks
+- ✅ **Comprehensive error messages** - Shows all attempted paths
 
 **Backup Created:**
 - `cli.js.backup` (in the same directory as cli.js)
@@ -200,10 +228,38 @@ grep -n 'case"thinking":if(K)return null' ~/.claude/local/node_modules/@anthropi
 
 **Cause:** The script cannot locate your Claude Code installation.
 
-**Solution:**
-1. Verify Claude Code is installed: `claude --version`
-2. Check if cli.js exists in one of the searched locations
-3. Manually specify the path by editing the script if installed in a custom location
+The script will display all attempted detection methods and paths, for example:
+
+```
+❌ Error: Could not find Claude Code installation
+
+Searched using the following methods:
+
+  [local installation]
+    - ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+    - ~/.config/claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+  [npm root -g]
+    - /opt/homebrew/lib/node_modules/@anthropic-ai/claude-code/cli.js
+  [derived from process.execPath]
+    - /opt/homebrew/bin/../lib/node_modules/@anthropic-ai/claude-code/cli.js
+  [which claude]
+    - /opt/homebrew/bin/../lib/node_modules/@anthropic-ai/claude-code/cli.js
+
+💡 Troubleshooting:
+  1. Verify Claude Code is installed: claude --version
+  2. For local install: Check ~/.claude/local or ~/.config/claude/local
+  3. For global install: Ensure "npm install -g @anthropic-ai/claude-code" succeeded
+  4. Check that npm is in your PATH if using global install
+```
+
+**Solutions:**
+1. **Verify installation:** Run `claude --version` to confirm Claude Code is installed
+2. **For local installations:** Check that cli.js exists in `~/.claude/local` or `~/.config/claude/local`
+3. **For global installations:**
+   - Ensure `npm install -g @anthropic-ai/claude-code` completed successfully
+   - Verify npm is in your PATH: `npm --version`
+   - If using NVM: Ensure you've activated the correct Node version
+4. **Check file permissions:** Ensure the script has read access to the installation directory
 
 ### "Pattern not found"
 
@@ -228,11 +284,41 @@ The patch script creates a backup automatically on first run. The `--restore` co
 ## Cross-Platform Support
 
 The script works on:
-- **macOS** ✅
-- **Linux** ✅
-- **Windows** ⚠️ (Not tested, but should work)
+- **macOS** ✅ Full support (all 4 detection methods)
+- **Linux** ✅ Full support (all 4 detection methods)
+- **Windows** ✅ Supported (3 detection methods - excludes `which claude`)
 
-Path detection is automatic using Node.js `os.homedir()`.
+### Platform-Specific Notes
+
+**macOS & Linux:**
+- All 4 detection methods available
+- Includes `which claude` binary resolution
+- Automatic symlink resolution for Homebrew, NVM, etc.
+
+**Windows:**
+- Uses first 3 detection methods
+- Works with nvm-windows and system Node
+- Skips Unix-specific `which` command
+
+Path detection is fully automatic using Node.js built-in modules.
+
+### Version Manager Support
+
+The script automatically works with all Node.js version managers:
+
+| Version Manager | Support | Notes |
+|----------------|---------|-------|
+| **NVM** (Node Version Manager) | ✅ Full | Detects via `npm root -g` |
+| **nodenv** | ✅ Full | Detects via `process.execPath` |
+| **asdf** | ✅ Full | Detects via `npm root -g` |
+| **nvm-windows** | ✅ Full | Works with all 3 Windows methods |
+| **System Node** | ✅ Full | Standard installation detection |
+| **Homebrew** (macOS) | ✅ Full | Symlink resolution included |
+
+**How it works:**
+- `npm root -g` dynamically finds the global node_modules directory regardless of version manager
+- `process.execPath` derives the path from the current Node.js binary location
+- No hardcoded paths means it works with any Node setup
 
 ## Technical Details
 
@@ -240,6 +326,31 @@ Path detection is automatic using Node.js `os.homedir()`.
 - **cli.js:** ~3,500+ lines, ~9+ MB (heavily minified)
 - **Version:** Claude Code 2.0.14
 - **Patches:** Non-invasive, minimal changes
+
+### Installation Detection System
+
+The patcher uses a sophisticated detection system with multiple fallback methods:
+
+```javascript
+// Priority 1: Local installations
+~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+~/.config/claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+
+// Priority 2: Global npm (dynamic)
+$(npm root -g)/@anthropic-ai/claude-code/cli.js
+
+// Priority 3: Derived from Node binary
+$(dirname process.execPath)/../lib/node_modules/@anthropic-ai/claude-code/cli.js
+
+// Priority 4: Unix binary resolution
+$(which claude) → resolve symlinks → find cli.js
+```
+
+**Key implementation details:**
+- Uses `child_process.execSync()` with proper error handling
+- Automatically resolves symlinks via `fs.realpathSync()`
+- Tracks all attempted paths for detailed error reporting
+- Cross-platform compatible (Windows, macOS, Linux)
 
 ### Why Two Patches?
 
