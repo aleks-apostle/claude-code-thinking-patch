@@ -13,7 +13,7 @@ const showHelp = args.includes('--help') || args.includes('-h');
 
 // Display help
 if (showHelp) {
-  console.log('Claude Code Thinking Visibility Patcher v2.0.19');
+  console.log('Claude Code Thinking Visibility Patcher v2.0.21');
   console.log('==============================================\n');
   console.log('Usage: node patch-thinking.js [options]\n');
   console.log('Options:');
@@ -27,7 +27,7 @@ if (showHelp) {
   process.exit(0);
 }
 
-console.log('Claude Code Thinking Visibility Patcher v2.0.19');
+console.log('Claude Code Thinking Visibility Patcher v2.0.21');
 console.log('==============================================\n');
 
 // Helper function to safely execute shell commands
@@ -176,13 +176,13 @@ if (!fs.existsSync(targetPath)) {
 
 let content = fs.readFileSync(targetPath, 'utf8');
 
-// Patch 1: aFB Banner Removal (v2.0.19)
-const bannerSearchPattern = 'function aFB({streamMode:A}){let[B,Q]=BV1.useState(null),[Z,G]=BV1.useState(null);if(BV1.useEffect(()=>{if(A==="thinking"&&B===null)Q(Date.now());else if(A!=="thinking"&&B!==null)G(Date.now()-B),Q(null)},[A,B]),A==="thinking")return ZM.createElement(j,{marginTop:1},ZM.createElement($,{dimColor:!0},"∴ Thinking…"));if(Z!==null)return ZM.createElement(j,{marginTop:1},ZM.createElement($,{dimColor:!0},"∴ Thought for ",Math.max(1,Math.round(Z/1000)),"s"," ",ZM.createElement($,{dimColor:!0,bold:!0},"(ctrl+o")," ","to show thinking)"));return null}';
-const bannerReplacement = 'function aFB({streamMode:A}){return null}';
+// Patch 1: wVB Banner Removal (v2.0.21)
+const bannerSearchPattern = 'function wVB({streamMode:A}){let[B,Q]=DV1.useState(null),[Z,G]=DV1.useState(null);if(DV1.useEffect(()=>{if(A==="thinking"&&B===null)Q(Date.now());else if(A!=="thinking"&&B!==null)G(Date.now()-B),Q(null)},[A,B]),A==="thinking")return XM.createElement(j,{marginTop:1},XM.createElement($,{dimColor:!0},"∴ Thinking…"));if(Z!==null)return XM.createElement(j,{marginTop:1},XM.createElement($,{dimColor:!0},"∴ Thought for ",Math.max(1,Math.round(Z/1000)),"s"," ",XM.createElement($,{dimColor:!0,bold:!0},"(ctrl+o")," ","to show thinking)"));return null}';
+const bannerReplacement = 'function wVB({streamMode:A}){return null}';
 
-// Patch 2: Thinking Visibility (v2.0.19)
-const thinkingSearchPattern = 'case"thinking":if(!D)return null;if(K)return null;return B7.createElement(NoB,{addMargin:B,param:A,isTranscriptMode:D});';
-const thinkingReplacement = 'case"thinking":if(K)return null;return B7.createElement(NoB,{addMargin:B,param:A,isTranscriptMode:!0});';
+// Patch 2: Thinking Visibility (v2.0.21)
+const thinkingSearchPattern = 'case"thinking":if(!K)return null;if(D)return null;return G7.createElement(H8Q,{addMargin:B,param:A,isTranscriptMode:K});';
+const thinkingReplacement = 'case"thinking":if(D)return null;return G7.createElement(H8Q,{addMargin:B,param:A,isTranscriptMode:!0});';
 
 let patch1Applied = false;
 let patch2Applied = false;
@@ -190,7 +190,7 @@ let patch2Applied = false;
 // Check if patches can be applied
 console.log('Checking patches...\n');
 
-console.log('Patch 1: aFB banner removal');
+console.log('Patch 1: wVB banner removal');
 if (content.includes(bannerSearchPattern)) {
   patch1Applied = true;
   console.log('  ✅ Pattern found - ready to apply');
@@ -243,7 +243,7 @@ console.log('\nApplying patches...');
 // Apply Patch 1
 if (patch1Applied) {
   content = content.replace(bannerSearchPattern, bannerReplacement);
-  console.log('✅ Patch 1 applied: aFB function now returns null');
+  console.log('✅ Patch 1 applied: wVB function now returns null');
 }
 
 // Apply Patch 2
