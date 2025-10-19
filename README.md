@@ -11,7 +11,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.21 (Updated 2025-01-17)
+**Current Version:** Claude Code 2.0.22 (Updated 2025-01-19)
 
 ## Quick Start
 
@@ -53,17 +53,17 @@ That's it! Thinking blocks now display inline without `ctrl+o`.
 
 This patch modifies two locations in Claude Code's compiled JavaScript:
 
-### Patch 1: Remove the Banner (v2.0.21)
+### Patch 1: Remove the Banner (v2.0.22)
 **Before:**
 ```javascript
-function wVB({streamMode:A}){
+function YOB({streamMode:A}){
   // ... displays "Thought for Xs (ctrl+o to show thinking)"
 }
 ```
 
 **After:**
 ```javascript
-function wVB({streamMode:A}){return null}
+function YOB({streamMode:A}){return null}
 ```
 
 **Effect:** Removes the collapsed thinking banner entirely.
@@ -77,18 +77,19 @@ function wVB({streamMode:A}){return null}
 - v2.0.15: Renamed to `KYB`, uses `xL.createElement`, `mX1.useState`
 - v2.0.19: Renamed to `aFB`, uses `ZM.createElement`, `BV1.useState`
 - v2.0.21: Renamed to `wVB`, uses `XM.createElement`, `DV1.useState`
+- v2.0.22: Renamed to `YOB`, uses `NM.createElement`, `zK1.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.21)
+### Patch 2: Force Thinking Visibility (v2.0.22)
 **Before:**
 ```javascript
 case"thinking":if(!K)return null;if(D)return null;
-  return G7.createElement(H8Q,{addMargin:B,param:A,isTranscriptMode:K});
+  return e3.createElement(nNB,{addMargin:B,param:A,isTranscriptMode:K});
 ```
 
 **After:**
 ```javascript
 case"thinking":if(D)return null;
-  return G7.createElement(H8Q,{addMargin:B,param:A,isTranscriptMode:!0});
+  return e3.createElement(nNB,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -102,11 +103,12 @@ case"thinking":if(D)return null;
 - v2.0.15: Changed to `FpB` component, `z3`→`C3` variable
 - v2.0.19: Changed to `NoB` component, `C3`→`B7` variable
 - v2.0.21: Changed to `H8Q` component, `B7`→`G7` variable, checks `K` and `D`
+- v2.0.22: Changed to `nNB` component, `G7`→`e3` variable, checks `K` and `D`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.21 installed
+- Claude Code v2.0.22 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -214,18 +216,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.21):
+Check if patches are applied (for v2.0.22):
 
 ```bash
-# Check wVB patch
-grep -n "function wVB" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check YOB patch
+grep -n "function YOB" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function wVB({streamMode:A}){return null}
+# Should show: function YOB({streamMode:A}){return null}
 
 # Check thinking visibility patch
 grep -n 'case"thinking":if(D)return null' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":if(D)return null;return G7.createElement(H8Q,{addMargin:B,param:A,isTranscriptMode:!0});
+# Should show: case"thinking":if(D)return null;return e3.createElement(nNB,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 ## Troubleshooting
@@ -381,6 +383,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.15  | `KYB`          | `FpB`     | `K` check |
 | 2.0.19  | `aFB`          | `NoB`     | `K` check |
 | 2.0.21  | `wVB`          | `H8Q`     | `K,D` check |
+| 2.0.22  | `YOB`          | `nNB`     | `K,D` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification.
 
@@ -389,7 +392,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.21
+4. **Version-specific:** Patterns are specific to v2.0.22
 
 ## Feature Request
 
@@ -427,8 +430,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-01-17
-**Claude Code Version:** 2.0.21
+**Last Updated:** 2025-01-19
+**Claude Code Version:** 2.0.22
 **Status:** ✅ Working
 
 ### Quick Reference
