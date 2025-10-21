@@ -11,7 +11,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.22 (Updated 2025-01-19)
+**Current Version:** Claude Code 2.0.24 (Updated 2025-01-21)
 
 ## Quick Start
 
@@ -53,17 +53,17 @@ That's it! Thinking blocks now display inline without `ctrl+o`.
 
 This patch modifies two locations in Claude Code's compiled JavaScript:
 
-### Patch 1: Remove the Banner (v2.0.22)
+### Patch 1: Remove the Banner (v2.0.24)
 **Before:**
 ```javascript
-function YOB({streamMode:A}){
+function GSB({streamMode:A}){
   // ... displays "Thought for Xs (ctrl+o to show thinking)"
 }
 ```
 
 **After:**
 ```javascript
-function YOB({streamMode:A}){return null}
+function GSB({streamMode:A}){return null}
 ```
 
 **Effect:** Removes the collapsed thinking banner entirely.
@@ -78,18 +78,19 @@ function YOB({streamMode:A}){return null}
 - v2.0.19: Renamed to `aFB`, uses `ZM.createElement`, `BV1.useState`
 - v2.0.21: Renamed to `wVB`, uses `XM.createElement`, `DV1.useState`
 - v2.0.22: Renamed to `YOB`, uses `NM.createElement`, `zK1.useState`
+- v2.0.24: Renamed to `GSB`, uses `oM.createElement`, `kD1.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.22)
+### Patch 2: Force Thinking Visibility (v2.0.24)
 **Before:**
 ```javascript
 case"thinking":if(!K)return null;if(D)return null;
-  return e3.createElement(nNB,{addMargin:B,param:A,isTranscriptMode:K});
+  return Y7.createElement(nTB,{addMargin:B,param:A,isTranscriptMode:K});
 ```
 
 **After:**
 ```javascript
 case"thinking":if(D)return null;
-  return e3.createElement(nNB,{addMargin:B,param:A,isTranscriptMode:!0});
+  return Y7.createElement(nTB,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -104,11 +105,12 @@ case"thinking":if(D)return null;
 - v2.0.19: Changed to `NoB` component, `C3`→`B7` variable
 - v2.0.21: Changed to `H8Q` component, `B7`→`G7` variable, checks `K` and `D`
 - v2.0.22: Changed to `nNB` component, `G7`→`e3` variable, checks `K` and `D`
+- v2.0.24: Changed to `nTB` component, `e3`→`Y7` variable, checks `K` and `D`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.22 installed
+- Claude Code v2.0.24 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -216,18 +218,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.22):
+Check if patches are applied (for v2.0.24):
 
 ```bash
-# Check YOB patch
-grep -n "function YOB" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check GSB patch
+grep -n "function GSB" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function YOB({streamMode:A}){return null}
+# Should show: function GSB({streamMode:A}){return null}
 
 # Check thinking visibility patch
 grep -n 'case"thinking":if(D)return null' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":if(D)return null;return e3.createElement(nNB,{addMargin:B,param:A,isTranscriptMode:!0});
+# Should show: case"thinking":if(D)return null;return Y7.createElement(nTB,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 ## Troubleshooting
@@ -332,7 +334,7 @@ The script automatically works with all Node.js version managers:
 
 ### File Structure
 - **cli.js:** ~3,600+ lines, ~9+ MB (heavily minified)
-- **Version:** Claude Code 2.0.21
+- **Version:** Claude Code 2.0.24
 - **Patches:** Non-invasive, minimal changes
 
 ### Installation Detection System
@@ -362,11 +364,11 @@ $(which claude) → resolve symlinks → find cli.js
 
 ### Why Two Patches?
 
-1. **wVB Function:** Controls the UI banner shown after thinking completes
+1. **GSB Function:** Controls the UI banner shown after thinking completes
 2. **Thinking Renderer:** Controls whether the actual thinking text is displayed
 
 Both must be patched because they're separate systems:
-- Patching only wVB → Blank line appears where thinking should be
+- Patching only GSB → Blank line appears where thinking should be
 - Patching only the renderer → Banner still shows "ctrl+o to show"
 
 ### Pattern Evolution Across Versions
@@ -384,6 +386,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.19  | `aFB`          | `NoB`     | `K` check |
 | 2.0.21  | `wVB`          | `H8Q`     | `K,D` check |
 | 2.0.22  | `YOB`          | `nNB`     | `K,D` check |
+| 2.0.24  | `GSB`          | `nTB`     | `K,D` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification.
 
@@ -392,7 +395,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.22
+4. **Version-specific:** Patterns are specific to v2.0.24
 
 ## Feature Request
 
@@ -430,8 +433,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-01-19
-**Claude Code Version:** 2.0.22
+**Last Updated:** 2025-01-21
+**Claude Code Version:** 2.0.24
 **Status:** ✅ Working
 
 ### Quick Reference
