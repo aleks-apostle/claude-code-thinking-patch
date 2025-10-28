@@ -11,7 +11,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.26 (Updated 2025-01-24)
+**Current Version:** Claude Code 2.0.28 (Updated 2025-01-28)
 
 ## Quick Start
 
@@ -53,17 +53,17 @@ That's it! Thinking blocks now display inline without `ctrl+o`.
 
 This patch modifies two locations in Claude Code's compiled JavaScript:
 
-### Patch 1: Remove the Banner (v2.0.26)
+### Patch 1: Remove the Banner (v2.0.28)
 **Before:**
 ```javascript
-function KjQ({streamMode:A}){
+function RjQ({streamMode:A}){
   // ... displays "Thought for Xs (ctrl+o to show thinking)"
 }
 ```
 
 **After:**
 ```javascript
-function KjQ({streamMode:A}){return null}
+function RjQ({streamMode:A}){return null}
 ```
 
 **Effect:** Removes the collapsed thinking banner entirely.
@@ -81,18 +81,19 @@ function KjQ({streamMode:A}){return null}
 - v2.0.24: Renamed to `GSB`, uses `oM.createElement`, `kD1.useState`
 - v2.0.25: Renamed to `YSB`, uses `tM.createElement`, `xD1.useState`
 - v2.0.26: Renamed to `KjQ`, uses `QO.createElement`, `gKA.useState`
+- v2.0.28: Renamed to `RjQ`, uses `IO.createElement`, `iKA.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.26)
+### Patch 2: Force Thinking Visibility (v2.0.28)
 **Before:**
 ```javascript
 case"thinking":if(!V)return null;
-  return Y3.createElement(CTQ,{addMargin:B,param:A,isTranscriptMode:V});
+  return C3.createElement(LTQ,{addMargin:B,param:A,isTranscriptMode:V});
 ```
 
 **After:**
 ```javascript
 case"thinking":
-  return Y3.createElement(CTQ,{addMargin:B,param:A,isTranscriptMode:!0});
+  return C3.createElement(LTQ,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -110,11 +111,12 @@ case"thinking":
 - v2.0.24: Changed to `nTB` component, `e3`→`Y7` variable, checks `K` and `D`
 - v2.0.25: Changed to `aTB` component, maintains `Y7` variable, checks `K` and `D`
 - v2.0.26: Changed to `CTQ` component, `Y7`→`Y3` variable, checks only `V`
+- v2.0.28: Changed to `LTQ` component, `Y3`→`C3` variable, checks only `V`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.26 installed
+- Claude Code v2.0.28 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -222,18 +224,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.26):
+Check if patches are applied (for v2.0.28):
 
 ```bash
-# Check KjQ patch
-grep -n "function KjQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check RjQ patch
+grep -n "function RjQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function KjQ({streamMode:A}){return null}
+# Should show: function RjQ({streamMode:A}){return null}
 
 # Check thinking visibility patch
-grep -n 'case"thinking":return Y3.createElement(CTQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+grep -n 'case"thinking":return C3.createElement(LTQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":return Y3.createElement(CTQ,{addMargin:B,param:A,isTranscriptMode:!0});
+# Should show: case"thinking":return C3.createElement(LTQ,{addMargin:B,param:A,isTranscriptMode:!0});
 ```
 
 ## Troubleshooting
@@ -338,7 +340,7 @@ The script automatically works with all Node.js version managers:
 
 ### File Structure
 - **cli.js:** ~3,600+ lines, ~9+ MB (heavily minified)
-- **Version:** Claude Code 2.0.26
+- **Version:** Claude Code 2.0.28
 - **Patches:** Non-invasive, minimal changes
 
 ### Installation Detection System
@@ -393,6 +395,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.24  | `GSB`          | `nTB`     | `K,D` check |
 | 2.0.25  | `YSB`          | `aTB`     | `K,D` check |
 | 2.0.26  | `KjQ`          | `CTQ`     | `V` check   |
+| 2.0.28  | `RjQ`          | `LTQ`     | `V` check   |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification.
 
@@ -401,7 +404,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.26
+4. **Version-specific:** Patterns are specific to v2.0.28
 
 ## Feature Request
 
@@ -439,8 +442,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-01-24
-**Claude Code Version:** 2.0.26
+**Last Updated:** 2025-01-28
+**Claude Code Version:** 2.0.28
 **Status:** ✅ Working
 
 ### Quick Reference
