@@ -13,7 +13,7 @@ const showHelp = args.includes('--help') || args.includes('-h');
 
 // Display help
 if (showHelp) {
-  console.log('Claude Code Thinking Visibility Patcher v2.0.28');
+  console.log('Claude Code Thinking Visibility Patcher v2.0.29');
   console.log('==============================================\n');
   console.log('Usage: node patch-thinking.js [options]\n');
   console.log('Options:');
@@ -27,7 +27,7 @@ if (showHelp) {
   process.exit(0);
 }
 
-console.log('Claude Code Thinking Visibility Patcher v2.0.28');
+console.log('Claude Code Thinking Visibility Patcher v2.0.29');
 console.log('==============================================\n');
 
 // Helper function to safely execute shell commands
@@ -176,11 +176,12 @@ if (!fs.existsSync(targetPath)) {
 
 let content = fs.readFileSync(targetPath, 'utf8');
 
-// Patch 1: RjQ Banner Removal (v2.0.28)
+// Patch 1: RjQ Banner Removal (v2.0.29)
+// Note: Patterns unchanged from v2.0.28
 const bannerSearchPattern = 'function RjQ({streamMode:A}){let[B,Q]=iKA.useState(null),[I,G]=iKA.useState(null);if(iKA.useEffect(()=>{if(A==="thinking"&&B===null)Q(Date.now());else if(A!=="thinking"&&B!==null)G(Date.now()-B),Q(null)},[A,B]),A==="thinking")return IO.createElement(S,{marginTop:1},IO.createElement(z,{dimColor:!0},"∴ Thinking…"));if(I!==null)return IO.createElement(S,{marginTop:1},IO.createElement(z,{dimColor:!0},"∴ Thought for ",Math.max(1,Math.round(I/1000)),"s (",IO.createElement(z,{dimColor:!0,bold:!0},"ctrl+o")," ","to show thinking)"));return null}';
 const bannerReplacement = 'function RjQ({streamMode:A}){return null}';
 
-// Patch 2: Thinking Visibility (v2.0.28)
+// Patch 2: Thinking Visibility (v2.0.29)
 const thinkingSearchPattern = 'case"thinking":if(!V)return null;return C3.createElement(LTQ,{addMargin:B,param:A,isTranscriptMode:V});';
 const thinkingReplacement = 'case"thinking":return C3.createElement(LTQ,{addMargin:B,param:A,isTranscriptMode:!0});';
 
