@@ -1,4 +1,15 @@
-# Claude Code Thinking Display Patch
+# Claude Code Patches
+
+Enhance Claude Code with custom patches for thinking display and subagent model configuration.
+
+## Available Patches
+
+1. **[Thinking Display Patch](#thinking-display-patch)** - Make thinking blocks visible by default
+2. **[Subagent Model Configuration](#subagent-model-configuration)** - Configure which models subagents use
+
+---
+
+## Thinking Display Patch
 
 Make Claude Code's thinking blocks visible by default without pressing `ctrl+o`.
 
@@ -440,6 +451,184 @@ If Claude Code updates and the patches stop working:
 4. **Update this README** with the new version information
 
 Pull requests welcome!
+
+---
+
+## Subagent Model Configuration
+
+Configure which AI models Claude Code uses for different subagent types (Plan, Explore, general-purpose).
+
+### The Problem
+
+By default, Claude Code hardcodes the models used by subagents:
+- **Plan subagent**: Uses Sonnet (for planning tasks)
+- **Explore subagent**: Uses Haiku (for code exploration)
+- **general-purpose subagent**: Inherits from main loop model
+
+You cannot change these defaults without modifying the source code.
+
+### The Solution
+
+This patch allows you to configure subagent models via a configuration file (`~/.claude/subagent-models.json`).
+
+**Current Version:** Claude Code 2.0.31
+
+### Quick Start
+
+```bash
+# 1. Create configuration file
+cat > ~/.claude/subagent-models.json <<EOF
+{
+  "Plan": "sonnet",
+  "Explore": "sonnet",
+  "general-purpose": "sonnet"
+}
+EOF
+
+# 2. Run the patch script
+node patch-subagent-models.js
+
+# 3. Restart Claude Code
+```
+
+### Configuration
+
+Create `~/.claude/subagent-models.json` with your preferred models:
+
+```json
+{
+  "Plan": "sonnet",
+  "Explore": "haiku",
+  "general-purpose": "sonnet"
+}
+```
+
+**Valid model values:**
+- `"haiku"` - Fast and efficient (Claude Haiku 4.5)
+- `"sonnet"` - Balanced performance (Claude Sonnet 4.5)
+- `"opus"` - Most capable (Claude Opus 4.1)
+
+**Subagent Types:**
+- **Plan** - Used in planning mode for breaking down tasks
+- **Explore** - Used for codebase exploration and file searching
+- **general-purpose** - Used for general multi-step tasks
+
+### Command-Line Options
+
+```bash
+# Apply patches
+node patch-subagent-models.js
+
+# Preview changes without applying
+node patch-subagent-models.js --dry-run
+
+# Restore original behavior
+node patch-subagent-models.js --restore
+
+# Show help
+node patch-subagent-models.js --help
+```
+
+### How It Works
+
+The patch modifies Claude Code's `cli.js` to change the hardcoded model assignments:
+
+**Before (v2.0.31):**
+```javascript
+// Plan subagent
+H3A={agentType:"Plan",...,model:"sonnet"}
+
+// Explore subagent
+model:"haiku"}});var H3A;
+```
+
+**After (with config: Plan="haiku", Explore="sonnet"):**
+```javascript
+// Plan subagent
+H3A={agentType:"Plan",...,model:"haiku"}
+
+// Explore subagent
+model:"sonnet"}});var H3A;
+```
+
+### Important Notes
+
+1. **After Claude Code Updates:** Must re-run after `claude update`:
+   ```bash
+   node patch-subagent-models.js
+   ```
+
+2. **Backup:** Created automatically at:
+   ```
+   ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js.subagent-models.backup
+   ```
+
+3. **Version-Specific:** Patterns are specific to v2.0.31. May need updates for newer versions.
+
+### Restoration
+
+**Using the script:**
+```bash
+node patch-subagent-models.js --restore
+```
+
+**Manual restore:**
+```bash
+cp ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js.subagent-models.backup \
+   ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+```
+
+### Example Use Cases
+
+**Use Sonnet everywhere (avoid Haiku):**
+```json
+{
+  "Plan": "sonnet",
+  "Explore": "sonnet",
+  "general-purpose": "sonnet"
+}
+```
+
+**Use Haiku for speed:**
+```json
+{
+  "Plan": "haiku",
+  "Explore": "haiku",
+  "general-purpose": "haiku"
+}
+```
+
+**Balanced approach:**
+```json
+{
+  "Plan": "sonnet",
+  "Explore": "haiku",
+  "general-purpose": "sonnet"
+}
+```
+
+### Troubleshooting
+
+**"No model configuration found"**
+- Create `~/.claude/subagent-models.json` with your desired configuration
+- Ensure the JSON syntax is valid
+
+**"Pattern not found"**
+- Claude Code version may have changed
+- Run with `--dry-run` to see which patterns are detected
+- Check if patches are already applied
+
+**Changes not taking effect**
+- Restart Claude Code after applying patches
+- Verify patches were applied with `--dry-run`
+
+### Version History
+
+| Version | Plan Default | Explore Default | Notes |
+|---------|-------------|-----------------|-------|
+| 2.0.31  | sonnet      | haiku           | Current |
+
+---
 
 ## License
 
