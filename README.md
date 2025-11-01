@@ -11,7 +11,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.30 (Updated 2025-01-31)
+**Current Version:** Claude Code 2.0.31 (Updated 2025-02-01)
 
 ## Quick Start
 
@@ -84,18 +84,19 @@ function GkQ({streamMode:A}){return null}
 - v2.0.28: Renamed to `RjQ`, uses `IO.createElement`, `iKA.useState`
 - v2.0.29: Unchanged from v2.0.28 (`RjQ`, `IO.createElement`, `iKA.useState`)
 - v2.0.30: Renamed to `GkQ`, uses `NO.createElement`, `dDA.useState`
+- v2.0.31: Renamed to `_kQ`, uses `MO.createElement`, `nDA.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.30)
+### Patch 2: Force Thinking Visibility (v2.0.31)
 **Before:**
 ```javascript
 case"thinking":if(!V&&!I)return null;
-  return D3.createElement(sjQ,{addMargin:B,param:A,isTranscriptMode:V,verbose:I});
+  return E3.createElement(MSQ,{addMargin:B,param:A,isTranscriptMode:V,verbose:I});
 ```
 
 **After:**
 ```javascript
 case"thinking":
-  return D3.createElement(sjQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+  return E3.createElement(MSQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -116,11 +117,12 @@ case"thinking":
 - v2.0.28: Changed to `LTQ` component, `Y3`→`C3` variable, checks only `V`
 - v2.0.29: Unchanged from v2.0.28 (`LTQ` component, `C3` variable, checks `V`)
 - v2.0.30: Changed to `sjQ` component, `C3`→`D3` variable, checks `V` and `I`, added `verbose` parameter
+- v2.0.31: Changed to `MSQ` component, `D3`→`E3` variable, checks `V` and `I`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.30 installed
+- Claude Code v2.0.31 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -228,18 +230,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.30):
+Check if patches are applied (for v2.0.31):
 
 ```bash
-# Check GkQ patch
-grep -n "function GkQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check _kQ patch
+grep -n "function _kQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function GkQ({streamMode:A}){return null}
+# Should show: function _kQ({streamMode:A}){return null}
 
 # Check thinking visibility patch
-grep -n 'case"thinking":return D3.createElement(sjQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+grep -n 'case"thinking":return E3.createElement(MSQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":return D3.createElement(sjQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+# Should show: case"thinking":return E3.createElement(MSQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
 ```
 
 ## Troubleshooting
@@ -344,7 +346,7 @@ The script automatically works with all Node.js version managers:
 
 ### File Structure
 - **cli.js:** ~3,600+ lines, ~9+ MB (heavily minified)
-- **Version:** Claude Code 2.0.29
+- **Version:** Claude Code 2.0.31
 - **Patches:** Non-invasive, minimal changes
 
 ### Installation Detection System
@@ -374,11 +376,11 @@ $(which claude) → resolve symlinks → find cli.js
 
 ### Why Two Patches?
 
-1. **KjQ Function:** Controls the UI banner shown after thinking completes
+1. **_kQ Function:** Controls the UI banner shown after thinking completes
 2. **Thinking Renderer:** Controls whether the actual thinking text is displayed
 
 Both must be patched because they're separate systems:
-- Patching only KjQ → Blank line appears where thinking should be
+- Patching only _kQ → Blank line appears where thinking should be
 - Patching only the renderer → Banner still shows "ctrl+o to show"
 
 ### Pattern Evolution Across Versions
@@ -402,6 +404,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.28  | `RjQ`          | `LTQ`     | `V` check   |
 | 2.0.29  | `RjQ`          | `LTQ`     | `V` check   |
 | 2.0.30  | `GkQ`          | `sjQ`     | `V,I` check |
+| 2.0.31  | `_kQ`          | `MSQ`     | `V,I` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification. In some cases (like v2.0.29), the patterns remain unchanged.
 
@@ -410,7 +413,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.30
+4. **Version-specific:** Patterns are specific to v2.0.31
 
 ## Feature Request
 
@@ -448,8 +451,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-01-31
-**Claude Code Version:** 2.0.30
+**Last Updated:** 2025-02-01
+**Claude Code Version:** 2.0.31
 **Status:** ✅ Working
 
 ### Quick Reference
