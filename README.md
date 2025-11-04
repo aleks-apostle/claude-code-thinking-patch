@@ -22,7 +22,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.31 (Updated 2025-02-01)
+**Current Version:** Claude Code 2.0.32 (Updated 2025-02-04)
 
 ## Quick Start
 
@@ -96,8 +96,9 @@ function GkQ({streamMode:A}){return null}
 - v2.0.29: Unchanged from v2.0.28 (`RjQ`, `IO.createElement`, `iKA.useState`)
 - v2.0.30: Renamed to `GkQ`, uses `NO.createElement`, `dDA.useState`
 - v2.0.31: Renamed to `_kQ`, uses `MO.createElement`, `nDA.useState`
+- v2.0.32: Renamed to `wkQ`, uses `LO.createElement`, `oDA.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.31)
+### Patch 2: Force Thinking Visibility (v2.0.32)
 **Before:**
 ```javascript
 case"thinking":if(!V&&!I)return null;
@@ -129,11 +130,12 @@ case"thinking":
 - v2.0.29: Unchanged from v2.0.28 (`LTQ` component, `C3` variable, checks `V`)
 - v2.0.30: Changed to `sjQ` component, `C3`→`D3` variable, checks `V` and `I`, added `verbose` parameter
 - v2.0.31: Changed to `MSQ` component, `D3`→`E3` variable, checks `V` and `I`
+- v2.0.32: Changed to `ljQ` component, `E3`→`F3` variable, checks `V` and `I`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.31 installed
+- Claude Code v2.0.32 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -241,18 +243,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.31):
+Check if patches are applied (for v2.0.32):
 
 ```bash
-# Check _kQ patch
-grep -n "function _kQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check wkQ patch
+grep -n "function wkQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function _kQ({streamMode:A}){return null}
+# Should show: function wkQ({streamMode:A}){return null}
 
 # Check thinking visibility patch
-grep -n 'case"thinking":return E3.createElement(MSQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+grep -n 'case"thinking":return F3.createElement(ljQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":return E3.createElement(MSQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+# Should show: case"thinking":return F3.createElement(ljQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
 ```
 
 ## Troubleshooting
@@ -416,6 +418,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.29  | `RjQ`          | `LTQ`     | `V` check   |
 | 2.0.30  | `GkQ`          | `sjQ`     | `V,I` check |
 | 2.0.31  | `_kQ`          | `MSQ`     | `V,I` check |
+| 2.0.32  | `wkQ`          | `ljQ`     | `V,I` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification. In some cases (like v2.0.29), the patterns remain unchanged.
 
@@ -424,7 +427,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.31
+4. **Version-specific:** Patterns are specific to v2.0.32
 
 ## Feature Request
 
@@ -471,7 +474,7 @@ You cannot change these defaults without modifying the source code.
 
 This patch allows you to configure subagent models via a configuration file (`~/.claude/subagent-models.json`).
 
-**Current Version:** Claude Code 2.0.31
+**Current Version:** Claude Code 2.0.32
 
 ### Quick Start
 
@@ -533,22 +536,22 @@ node patch-subagent-models.js --help
 
 The patch modifies Claude Code's `cli.js` to change the hardcoded model assignments:
 
-**Before (v2.0.31):**
+**Before (v2.0.32):**
 ```javascript
 // Plan subagent
-H3A={agentType:"Plan",...,model:"sonnet"}
+R3A={agentType:"Plan",...,model:"sonnet"}
 
 // Explore subagent
-model:"haiku"}});var H3A;
+model:"haiku"}});var R3A;
 ```
 
 **After (with config: Plan="haiku", Explore="sonnet"):**
 ```javascript
 // Plan subagent
-H3A={agentType:"Plan",...,model:"haiku"}
+R3A={agentType:"Plan",...,model:"haiku"}
 
 // Explore subagent
-model:"sonnet"}});var H3A;
+model:"sonnet"}});var R3A;
 ```
 
 ### Important Notes
@@ -563,7 +566,7 @@ model:"sonnet"}});var H3A;
    ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js.subagent-models.backup
    ```
 
-3. **Version-Specific:** Patterns are specific to v2.0.31. May need updates for newer versions.
+3. **Version-Specific:** Patterns are specific to v2.0.32. May need updates for newer versions.
 
 ### Restoration
 
@@ -626,7 +629,8 @@ cp ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js.subagent-models
 
 | Version | Plan Default | Explore Default | Notes |
 |---------|-------------|-----------------|-------|
-| 2.0.31  | sonnet      | haiku           | Current |
+| 2.0.31  | sonnet      | haiku           | Previous |
+| 2.0.32  | sonnet      | haiku           | Current |
 
 ---
 
@@ -640,8 +644,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-02-01
-**Claude Code Version:** 2.0.31
+**Last Updated:** 2025-02-04
+**Claude Code Version:** 2.0.32
 **Status:** ✅ Working
 
 ### Quick Reference
