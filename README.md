@@ -22,7 +22,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.32 (Updated 2025-02-04)
+**Current Version:** Claude Code 2.0.37 (Updated 2025-11-11)
 
 ## Quick Start
 
@@ -97,18 +97,19 @@ function GkQ({streamMode:A}){return null}
 - v2.0.30: Renamed to `GkQ`, uses `NO.createElement`, `dDA.useState`
 - v2.0.31: Renamed to `_kQ`, uses `MO.createElement`, `nDA.useState`
 - v2.0.32: Renamed to `wkQ`, uses `LO.createElement`, `oDA.useState`
+- v2.0.37: Renamed to `nR2`, uses `CR.createElement`, `AwA.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.32)
+### Patch 2: Force Thinking Visibility (v2.0.37)
 **Before:**
 ```javascript
 case"thinking":if(!V&&!I)return null;
-  return E3.createElement(MSQ,{addMargin:B,param:A,isTranscriptMode:V,verbose:I});
+  return K3.createElement(n$Q,{addMargin:B,param:A,isTranscriptMode:V,verbose:I});
 ```
 
 **After:**
 ```javascript
 case"thinking":
-  return E3.createElement(MSQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+  return K3.createElement(n$Q,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -131,11 +132,12 @@ case"thinking":
 - v2.0.30: Changed to `sjQ` component, `C3`→`D3` variable, checks `V` and `I`, added `verbose` parameter
 - v2.0.31: Changed to `MSQ` component, `D3`→`E3` variable, checks `V` and `I`
 - v2.0.32: Changed to `ljQ` component, `E3`→`F3` variable, checks `V` and `I`
+- v2.0.37: Changed to `n$Q` component, `F3`→`K3` variable, checks `V` and `I`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.32 installed
+- Claude Code v2.0.37 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -243,18 +245,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.32):
+Check if patches are applied (for v2.0.37):
 
 ```bash
-# Check wkQ patch
-grep -n "function wkQ" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check nR2 patch
+grep -n "function nR2" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function wkQ({streamMode:A}){return null}
+# Should show: function nR2({streamMode:A}){return null}
 
 # Check thinking visibility patch
-grep -n 'case"thinking":return F3.createElement(ljQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+grep -n 'case"thinking":return K3.createElement(n$Q' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":return F3.createElement(ljQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+# Should show: case"thinking":return K3.createElement(n$Q,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
 ```
 
 ## Troubleshooting
@@ -359,7 +361,7 @@ The script automatically works with all Node.js version managers:
 
 ### File Structure
 - **cli.js:** ~3,600+ lines, ~9+ MB (heavily minified)
-- **Version:** Claude Code 2.0.31
+- **Version:** Claude Code 2.0.37
 - **Patches:** Non-invasive, minimal changes
 
 ### Installation Detection System
@@ -389,11 +391,11 @@ $(which claude) → resolve symlinks → find cli.js
 
 ### Why Two Patches?
 
-1. **_kQ Function:** Controls the UI banner shown after thinking completes
+1. **nR2 Function:** Controls the UI banner shown after thinking completes
 2. **Thinking Renderer:** Controls whether the actual thinking text is displayed
 
 Both must be patched because they're separate systems:
-- Patching only _kQ → Blank line appears where thinking should be
+- Patching only nR2 → Blank line appears where thinking should be
 - Patching only the renderer → Banner still shows "ctrl+o to show"
 
 ### Pattern Evolution Across Versions
@@ -419,6 +421,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.30  | `GkQ`          | `sjQ`     | `V,I` check |
 | 2.0.31  | `_kQ`          | `MSQ`     | `V,I` check |
 | 2.0.32  | `wkQ`          | `ljQ`     | `V,I` check |
+| 2.0.37  | `nR2`          | `n$Q`     | `V,I` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification. In some cases (like v2.0.29), the patterns remain unchanged.
 
@@ -427,7 +430,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.32
+4. **Version-specific:** Patterns are specific to v2.0.37
 
 ## Feature Request
 
@@ -474,7 +477,7 @@ You cannot change these defaults without modifying the source code.
 
 This patch allows you to configure subagent models via a configuration file (`~/.claude/subagent-models.json`).
 
-**Current Version:** Claude Code 2.0.32
+**Current Version:** Claude Code 2.0.37
 
 ### Quick Start
 
@@ -536,7 +539,7 @@ node patch-subagent-models.js --help
 
 The patch modifies Claude Code's `cli.js` to change the hardcoded model assignments:
 
-**Before (v2.0.32):**
+**Before (v2.0.37):**
 ```javascript
 // Plan subagent
 R3A={agentType:"Plan",...,model:"sonnet"}
@@ -566,7 +569,7 @@ model:"sonnet"}});var R3A;
    ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js.subagent-models.backup
    ```
 
-3. **Version-Specific:** Patterns are specific to v2.0.32. May need updates for newer versions.
+3. **Version-Specific:** Patterns are specific to v2.0.37. May need updates for newer versions.
 
 ### Restoration
 
@@ -630,7 +633,8 @@ cp ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js.subagent-models
 | Version | Plan Default | Explore Default | Notes |
 |---------|-------------|-----------------|-------|
 | 2.0.31  | sonnet      | haiku           | Previous |
-| 2.0.32  | sonnet      | haiku           | Current |
+| 2.0.32  | sonnet      | haiku           | Previous |
+| 2.0.37  | sonnet      | haiku           | Current |
 
 ---
 
@@ -644,8 +648,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-02-04
-**Claude Code Version:** 2.0.32
+**Last Updated:** 2025-11-11
+**Claude Code Version:** 2.0.37
 **Status:** ✅ Working
 
 ### Quick Reference
