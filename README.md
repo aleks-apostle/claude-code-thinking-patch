@@ -22,7 +22,7 @@ Claude Code collapses thinking blocks by default, showing only:
 
 You have to press `ctrl+o` every time to see the actual thinking content. This patch makes thinking blocks visible inline automatically.
 
-**Current Version:** Claude Code 2.0.42 (Updated 2025-11-17)
+**Current Version:** Claude Code 2.0.46 (Updated 2025-11-19)
 
 ## Quick Start
 
@@ -99,18 +99,19 @@ function GkQ({streamMode:A}){return null}
 - v2.0.32: Renamed to `wkQ`, uses `LO.createElement`, `oDA.useState`
 - v2.0.37: Renamed to `nR2`, uses `CR.createElement`, `AwA.useState`
 - v2.0.42: Renamed to `cR2`, uses `RR.createElement`, `UwA.useState`
+- v2.0.46: Renamed to `Et2`, uses `xP.createElement`, `HTA.useState`
 
-### Patch 2: Force Thinking Visibility (v2.0.42)
+### Patch 2: Force Thinking Visibility (v2.0.46)
 **Before:**
 ```javascript
-case"thinking":if(!V&&!I)return null;
-  return w3.createElement(xLQ,{addMargin:B,param:A,isTranscriptMode:V,verbose:I});
+case"thinking":if(!K&&!Z)return null;
+  return H7.createElement(T32,{addMargin:Q,param:A,isTranscriptMode:K,verbose:Z});
 ```
 
 **After:**
 ```javascript
 case"thinking":
-  return w3.createElement(xLQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+  return H7.createElement(T32,{addMargin:Q,param:A,isTranscriptMode:!0,verbose:Z});
 ```
 
 **Effect:** Forces thinking content to render as if in transcript mode (visible).
@@ -135,11 +136,12 @@ case"thinking":
 - v2.0.32: Changed to `ljQ` component, `E3`→`F3` variable, checks `V` and `I`
 - v2.0.37: Changed to `n$Q` component, `F3`→`K3` variable, checks `V` and `I`
 - v2.0.42: Changed to `xLQ` component, `K3`→`w3` variable, checks `V` and `I`
+- v2.0.46: Changed to `T32` component, `w3`→`H7` variable, checks `K` and `Z`
 
 ## Installation
 
 ### Prerequisites
-- Claude Code v2.0.42 installed
+- Claude Code v2.0.46 installed
 - Node.js (comes with Claude Code installation)
 
 ### Install Steps
@@ -247,18 +249,18 @@ Then restart Claude Code.
 
 ## Verification
 
-Check if patches are applied (for v2.0.42):
+Check if patches are applied (for v2.0.46):
 
 ```bash
-# Check cR2 patch
-grep -n "function cR2" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+# Check Et2 patch
+grep -n "function Et2" ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: function cR2({streamMode:A}){return null}
+# Should show: function Et2({streamMode:A}){return null}
 
 # Check thinking visibility patch
-grep -n 'case"thinking":return w3.createElement(xLQ' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+grep -n 'case"thinking":return H7.createElement(T32' ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
 
-# Should show: case"thinking":return w3.createElement(xLQ,{addMargin:B,param:A,isTranscriptMode:!0,verbose:I});
+# Should show: case"thinking":return H7.createElement(T32,{addMargin:Q,param:A,isTranscriptMode:!0,verbose:Z});
 ```
 
 ## Troubleshooting
@@ -363,7 +365,7 @@ The script automatically works with all Node.js version managers:
 
 ### File Structure
 - **cli.js:** ~3,600+ lines, ~9+ MB (heavily minified)
-- **Version:** Claude Code 2.0.42
+- **Version:** Claude Code 2.0.46
 - **Patches:** Non-invasive, minimal changes
 
 ### Installation Detection System
@@ -393,11 +395,11 @@ $(which claude) → resolve symlinks → find cli.js
 
 ### Why Two Patches?
 
-1. **cR2 Function:** Controls the UI banner shown after thinking completes
+1. **Et2 Function:** Controls the UI banner shown after thinking completes
 2. **Thinking Renderer:** Controls whether the actual thinking text is displayed
 
 Both must be patched because they're separate systems:
-- Patching only cR2 → Blank line appears where thinking should be
+- Patching only Et2 → Blank line appears where thinking should be
 - Patching only the renderer → Banner still shows "ctrl+o to show"
 
 ### Pattern Evolution Across Versions
@@ -425,6 +427,7 @@ The minified code patterns change with each Claude Code update:
 | 2.0.32  | `wkQ`          | `ljQ`     | `V,I` check |
 | 2.0.37  | `nR2`          | `n$Q`     | `V,I` check |
 | 2.0.42  | `cR2`          | `xLQ`     | `V,I` check |
+| 2.0.46  | `Et2`          | `T32`     | `K,Z` check |
 
 When Claude Code updates, function names and component identifiers are regenerated during minification. In some cases (like v2.0.29), the patterns remain unchanged.
 
@@ -433,7 +436,7 @@ When Claude Code updates, function names and component identifiers are regenerat
 1. **Breaks on updates:** Must re-run after `claude update`
 2. **Minified code:** Fragile, patterns may change with version updates
 3. **No official config:** This is a workaround until Anthropic adds a native setting
-4. **Version-specific:** Patterns are specific to v2.0.42
+4. **Version-specific:** Patterns are specific to v2.0.46
 
 ## Feature Request
 
@@ -480,7 +483,7 @@ You cannot change these defaults without modifying the source code.
 
 This patch allows you to configure subagent models via a configuration file (`~/.claude/subagent-models.json`).
 
-**Current Version:** Claude Code 2.0.42
+**Current Version:** Claude Code 2.0.46
 
 ### Quick Start
 
@@ -651,8 +654,8 @@ Developed through analysis of Claude Code's compiled JavaScript. Special thanks 
 
 ---
 
-**Last Updated:** 2025-11-17
-**Claude Code Version:** 2.0.42
+**Last Updated:** 2025-11-19
+**Claude Code Version:** 2.0.46
 **Status:** ✅ Working
 
 ### Quick Reference
